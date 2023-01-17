@@ -8,7 +8,7 @@
     "lint-fix": "eslint . --ext .ts --fix",
     "dev": "nodemon -r dotenv/config ./src/server.ts",
     "build": "tsc",
-    "start": "npm run build && node -r dotenv/config ./dist/index.js"
+    "start": "rm -rf dist && npm run build && node -r dotenv/config ./dist/server.js"
   },
   "keywords": [],
   "author": "",
