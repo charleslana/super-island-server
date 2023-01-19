@@ -1,4 +1,5 @@
 import authenticateMiddleware from '../middleware/authenticate.middleware';
+import CharacterController from '../controller/CharacterController';
 import express from 'express';
 import RoleEnum from '../enum/RoleEnum';
 import roleMiddleware from '../middleware/role.middleware';
@@ -7,13 +8,6 @@ import {
   validateCharacterCreate,
   validateCharacterUpdate,
 } from '../middleware/celebrate/character.celebrate';
-import {
-  create,
-  change,
-  erase,
-  findAll,
-  findOne,
-} from '../controller/character.controller';
 
 const characterRouter = express.Router();
 
@@ -23,14 +17,16 @@ characterRouter
     validateCharacterCreate(),
     authenticateMiddleware,
     roleMiddleware([RoleEnum.Admin]),
-    create
+    CharacterController.create
   );
 
-characterRouter.route('/').get(authenticateMiddleware, findAll);
+characterRouter
+  .route('/')
+  .get(authenticateMiddleware, CharacterController.findAll);
 
 characterRouter
   .route('/:id')
-  .get(validateSetId(), authenticateMiddleware, findOne);
+  .get(validateSetId(), authenticateMiddleware, CharacterController.findOne);
 
 characterRouter
   .route('/')
@@ -38,7 +34,7 @@ characterRouter
     validateCharacterUpdate(),
     authenticateMiddleware,
     roleMiddleware([RoleEnum.Admin]),
-    change
+    CharacterController.update
   );
 
 characterRouter
@@ -47,7 +43,7 @@ characterRouter
     validateSetId(),
     authenticateMiddleware,
     roleMiddleware([RoleEnum.Admin]),
-    erase
+    CharacterController.delete
   );
 
 export default characterRouter;
