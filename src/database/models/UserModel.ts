@@ -44,7 +44,7 @@ export const UserModel = database.define(
       allowNull: false,
       defaultValue: 5000,
     },
-    gold: {
+    gem: {
       type: DataTypes.BIGINT,
       allowNull: false,
       defaultValue: 0,

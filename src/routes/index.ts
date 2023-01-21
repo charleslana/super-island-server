@@ -1,5 +1,6 @@
 import characterRouter from './character.routes';
 import itemRouter from './item.routes';
+import shopRouter from './shop.routes';
 import skillRouter from './skill.routes';
 import userCharacterRouter from './user.character.routes';
 import userItemRouter from './user.item.routes';
@@ -16,5 +17,6 @@ routes.use('/skill', skillRouter);
 routes.use('/user-skill', userSkillRouter);
 routes.use('/item', itemRouter);
 routes.use('/user-item', userItemRouter);
+routes.use('/shop', shopRouter);
 
 export default routes;

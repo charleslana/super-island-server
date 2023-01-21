@@ -4,6 +4,8 @@ import IPassword from '../interface/IPassword';
 import IUser from '../interface/IUser';
 import jwt from 'jsonwebtoken';
 import RoleEnum from '../enum/RoleEnum';
+import UserCharacterService from './UserCharacterService';
+import UserItemService from './UserItemService';
 import Utils from '../utils/Utils';
 import { Optional } from 'sequelize';
 import { UserModel } from '../database/models/UserModel';
@@ -19,7 +21,12 @@ export default class UserService {
       throw new AppError('E-mail do usuário já está cadastrado', 400);
     }
     user.password = Utils.encrypt(user.password as string);
-    await UserModel.create(user as Optional<unknown, never>);
+    const userSaved = await UserModel.create(user as Optional<unknown, never>);
+    const lastId = userSaved.getDataValue('id');
+    for (let index = 1; index <= 2; index++) {
+      await UserCharacterService.save(lastId, index);
+      await UserItemService.save(lastId, index);
+    }
   }
 
   public static async getAll(): Promise<IUser[]> {

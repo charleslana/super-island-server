@@ -1,3 +1,4 @@
+import ConfigService from './service/ConfigService';
 import cors from 'cors';
 import errorMiddleware from './middleware/error.middleware';
 import express, { Request, Response } from 'express';
@@ -42,5 +43,6 @@ const port = process.env.PORT || 5000;
 
 app.listen(port, async () => {
   await database.sync();
+  await ConfigService.execute();
   console.log(`Started on port ${port}`);
 });
