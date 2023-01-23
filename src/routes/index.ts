@@ -1,3 +1,4 @@
+import chapterRouter from './chapter.routes';
 import characterRouter from './character.routes';
 import itemRouter from './item.routes';
 import shopRouter from './shop.routes';
@@ -18,5 +19,6 @@ routes.use('/user-skill', userSkillRouter);
 routes.use('/item', itemRouter);
 routes.use('/user-item', userItemRouter);
 routes.use('/shop', shopRouter);
+routes.use('/chapter', chapterRouter);
 
 export default routes;
