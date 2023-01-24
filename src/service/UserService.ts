@@ -31,7 +31,7 @@ export default class UserService {
 
   public static async getAll(): Promise<IUser[]> {
     return (await UserModel.findAll({
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'authToken'] },
     })) as IUser[];
   }
 
@@ -66,6 +66,7 @@ export default class UserService {
     password: string
   ): Promise<IAuthenticate> {
     const user = (await UserModel.findOne({
+      attributes: ['id', 'email', 'password', 'role', 'authToken'],
       where: {
         email: email,
       },
@@ -79,6 +80,19 @@ export default class UserService {
     if (user.role === RoleEnum.Banned) {
       throw new AppError('A conta está banida', 401);
     }
+    const authToken = Utils.randomString(100);
+    const userUpdated = await UserModel.update(
+      {
+        authToken: authToken,
+      },
+      {
+        where: {
+          id: user.id,
+        },
+        returning: true,
+      }
+    );
+    user.authToken = userUpdated[1][0].get().authToken;
     const token = jwt.sign({ user }, process.env.TOKEN_SECRET as string, {
       expiresIn: '1d',
     });
@@ -94,7 +108,7 @@ export default class UserService {
       where: {
         id: id,
       },
-      attributes: { exclude: ['password'] },
+      attributes: { exclude: ['password', 'authToken'] },
     })) as IUser;
     if (!exist) {
       throw new AppError('Usuário não encontrado', 404);

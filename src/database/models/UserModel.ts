@@ -54,6 +54,10 @@ export const UserModel = database.define(
       allowNull: false,
       defaultValue: 100,
     },
+    authToken: {
+      type: DataTypes.STRING,
+      field: 'auth_token',
+    },
   },
   {
     freezeTableName: true,

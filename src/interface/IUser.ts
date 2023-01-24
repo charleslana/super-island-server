@@ -6,4 +6,5 @@ export default interface IUser {
   password?: string;
   name?: string;
   role?: RoleEnum;
+  authToken?: string;
 }
