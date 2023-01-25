@@ -9,6 +9,7 @@ import { ChapterModel } from '../database/models/ChapterModel';
 import { CharacterModel } from '../database/models/CharacterModel';
 import { ItemModel } from '../database/models/ItemModel';
 import { Optional } from 'sequelize';
+import { PhaseModel } from '../database/models/PhaseModel';
 import { ShopModel } from '../database/models/ShopModel';
 import { UserCharacterModel } from '../database/models/UserCharacterModel';
 import { UserItemModel } from '../database/models/UserItemModel';
@@ -23,6 +24,7 @@ export default class ConfigService {
     await this.createUserCharacters();
     await this.createUserItems();
     await this.createChapters();
+    await this.createPhases();
   }
 
   private static async createUsers(): Promise<void> {
@@ -190,6 +192,23 @@ export default class ConfigService {
         fifth,
         sixth,
       ]);
+    }
+  }
+
+  private static async createPhases(): Promise<void> {
+    const getAll = await PhaseModel.findAll();
+    if (getAll.length === 0) {
+      const first = {
+        name: 'Fase 1',
+        image: '1',
+        chapterId: 1,
+      } as IChapter as Optional<unknown, never>;
+      const second = {
+        name: 'Fase 2',
+        image: '1',
+        chapterId: 1,
+      } as IChapter as Optional<unknown, never>;
+      await PhaseModel.bulkCreate([first, second]);
     }
   }
 }
