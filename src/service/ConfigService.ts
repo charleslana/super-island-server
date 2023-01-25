@@ -1,12 +1,14 @@
 import CharacterClassEnum from '../enum/CharacterClassEnum';
 import IChapter from '../interface/IChapter';
 import ICharacter from '../interface/ICharacter';
+import IEnemy from '../interface/IEnemy';
 import IItem from '../interface/IItem';
 import IShop from '../interface/IShop';
 import IUser from '../interface/IUser';
 import RoleEnum from '../enum/RoleEnum';
 import { ChapterModel } from '../database/models/ChapterModel';
 import { CharacterModel } from '../database/models/CharacterModel';
+import { EnemyModel } from '../database/models/EnemyModel';
 import { ItemModel } from '../database/models/ItemModel';
 import { Optional } from 'sequelize';
 import { PhaseModel } from '../database/models/PhaseModel';
@@ -25,6 +27,7 @@ export default class ConfigService {
     await this.createUserItems();
     await this.createChapters();
     await this.createPhases();
+    await this.createEnemies();
   }
 
   private static async createUsers(): Promise<void> {
@@ -209,6 +212,21 @@ export default class ConfigService {
         chapterId: 1,
       } as IChapter as Optional<unknown, never>;
       await PhaseModel.bulkCreate([first, second]);
+    }
+  }
+
+  private static async createEnemies(): Promise<void> {
+    const getAll = await EnemyModel.findAll();
+    if (getAll.length === 0) {
+      const first = {
+        phaseId: 1,
+        characterId: 1,
+      } as IEnemy as Optional<unknown, never>;
+      const second = {
+        phaseId: 1,
+        characterId: 2,
+      } as IEnemy as Optional<unknown, never>;
+      await EnemyModel.bulkCreate([first, second]);
     }
   }
 }

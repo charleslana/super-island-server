@@ -1,5 +1,6 @@
 import chapterRouter from './chapter.routes';
 import characterRouter from './character.routes';
+import enemyRouter from './enemy.routes';
 import itemRouter from './item.routes';
 import phaseRouter from './phase.routes';
 import shopRouter from './shop.routes';
@@ -22,5 +23,6 @@ routes.use('/user-item', userItemRouter);
 routes.use('/shop', shopRouter);
 routes.use('/chapter', chapterRouter);
 routes.use('/phase', phaseRouter);
+routes.use('/enemy', enemyRouter);
 
 export default routes;

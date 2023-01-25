@@ -57,7 +57,7 @@ export default class PhaseService {
     });
   }
 
-  private static async getPhaseById(id?: number): Promise<IPhase> {
+  public static async getPhaseById(id?: number): Promise<IPhase> {
     const exist = (await PhaseModel.findOne({
       where: {
         id: id,
