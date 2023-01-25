@@ -20,13 +20,14 @@ export default class PhaseController {
   }
 
   public static async findAll(
-    _request: Request,
+    request: Request,
     response: Response,
     next: NextFunction
   ) {
-    console.log('Get all phases');
+    console.log('Get all chapter phases');
     try {
-      return response.status(200).json(await PhaseService.getAll());
+      const { id } = request.params;
+      return response.status(200).json(await PhaseService.getAll(+id));
     } catch (error) {
       next(error);
     }

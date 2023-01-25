@@ -20,7 +20,9 @@ phaseRouter
     PhaseController.create
   );
 
-phaseRouter.route('/').get(authenticateMiddleware, PhaseController.findAll);
+phaseRouter
+  .route('/chapter/:id')
+  .get(validateSetId(), authenticateMiddleware, PhaseController.findAll);
 
 phaseRouter
   .route('/:id')

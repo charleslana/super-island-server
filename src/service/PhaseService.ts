@@ -18,8 +18,12 @@ export default class PhaseService {
     await PhaseModel.create(phase as Optional<unknown, never>);
   }
 
-  public static async getAll(): Promise<IPhase[]> {
-    return (await PhaseModel.findAll()) as IPhase[];
+  public static async getAll(chapterId: number): Promise<IPhase[]> {
+    return (await PhaseModel.findAll({
+      where: {
+        chapterId: chapterId,
+      },
+    })) as IPhase[];
   }
 
   public static async get(id: number): Promise<IPhase> {
