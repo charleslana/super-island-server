@@ -36,3 +36,9 @@ export const PhaseModel = database.define(
     timestamps: false,
   }
 );
+
+PhaseModel.belongsTo(ChapterModel, {
+  as: 'chapter',
+  foreignKey: 'chapterId',
+  targetKey: 'id',
+});

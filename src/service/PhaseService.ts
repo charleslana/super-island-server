@@ -1,6 +1,7 @@
 import AppError from '../shared/AppError';
 import ChapterService from './ChapterService';
 import IPhase from '../interface/IPhase';
+import { ChapterModel } from '../database/models/ChapterModel';
 import { Optional } from 'sequelize';
 import { PhaseModel } from '../database/models/PhaseModel';
 
@@ -23,6 +24,12 @@ export default class PhaseService {
       where: {
         chapterId: chapterId,
       },
+      include: [
+        {
+          model: ChapterModel,
+          as: 'chapter',
+        },
+      ],
     })) as IPhase[];
   }
 
@@ -62,6 +69,12 @@ export default class PhaseService {
       where: {
         id: id,
       },
+      include: [
+        {
+          model: ChapterModel,
+          as: 'chapter',
+        },
+      ],
     })) as IPhase;
     if (!exist) {
       throw new AppError('Fase não encontrada', 404);
