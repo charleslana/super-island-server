@@ -44,3 +44,9 @@ EnemyModel.belongsTo(CharacterModel, {
   foreignKey: 'characterId',
   targetKey: 'id',
 });
+
+EnemyModel.belongsTo(PhaseModel, {
+  as: 'phase',
+  foreignKey: 'phaseId',
+  targetKey: 'id',
+});

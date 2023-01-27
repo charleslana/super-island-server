@@ -5,6 +5,7 @@ import PhaseService from './PhaseService';
 import { CharacterModel } from '../database/models/CharacterModel';
 import { EnemyModel } from '../database/models/EnemyModel';
 import { Optional } from 'sequelize';
+import { PhaseModel } from '../database/models/PhaseModel';
 
 export default class EnemyService {
   public static async save(enemy: IEnemy): Promise<void> {
@@ -22,6 +23,10 @@ export default class EnemyService {
         {
           model: CharacterModel,
           as: 'character',
+        },
+        {
+          model: PhaseModel,
+          as: 'phase',
         },
       ],
     })) as IEnemy[];
@@ -60,6 +65,10 @@ export default class EnemyService {
         {
           model: CharacterModel,
           as: 'character',
+        },
+        {
+          model: PhaseModel,
+          as: 'phase',
         },
       ],
     })) as IEnemy;
