@@ -78,7 +78,7 @@ export default class UserService {
       throw new AppError('Login ou senha inválidas', 404);
     }
     if (user.role === RoleEnum.Banned) {
-      throw new AppError('A conta está banida', 401);
+      throw new AppError('A conta está banida', 403);
     }
     const authToken = Utils.randomString(100);
     const userUpdated = await UserModel.update(
