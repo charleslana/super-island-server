@@ -1,14 +1,15 @@
 import AppError from '../shared/AppError';
 import IChapter from '../interface/IChapter';
+import sequelize, { Optional } from 'sequelize';
 import { ChapterModel } from '../database/models/ChapterModel';
-import { Optional } from 'sequelize';
 
 export default class ChapterService {
   public static async save(chapter: IChapter): Promise<void> {
     const count = await ChapterModel.count({
-      where: {
-        name: chapter.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', chapter.name)
+      ),
     });
     if (count) {
       throw new AppError('Nome do capítulo já existe', 400);
@@ -24,19 +25,24 @@ export default class ChapterService {
     return await this.getChapterById(id);
   }
 
-  public static async update(item: IChapter): Promise<void> {
-    await this.getChapterById(item.id);
+  public static async update(chapter: IChapter): Promise<void> {
+    await this.getChapterById(chapter.id);
     const exist = (await ChapterModel.findOne({
-      where: {
-        name: item.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', chapter.name)
+      ),
     })) as IChapter;
-    if (exist && exist.name === item.name && exist.id !== item.id) {
+    if (
+      exist &&
+      exist.name?.toLowerCase() === chapter.name?.toLowerCase() &&
+      exist.id !== chapter.id
+    ) {
       throw new AppError('Nome do capítulo já existe', 400);
     }
-    await ChapterModel.update(item as Optional<unknown, never>, {
+    await ChapterModel.update(chapter as Optional<unknown, never>, {
       where: {
-        id: item.id,
+        id: chapter.id,
       },
     });
   }

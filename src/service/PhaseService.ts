@@ -1,17 +1,18 @@
 import AppError from '../shared/AppError';
 import ChapterService from './ChapterService';
 import IPhase from '../interface/IPhase';
+import sequelize, { Optional } from 'sequelize';
 import { ChapterModel } from '../database/models/ChapterModel';
-import { Optional } from 'sequelize';
 import { PhaseModel } from '../database/models/PhaseModel';
 
 export default class PhaseService {
   public static async save(phase: IPhase): Promise<void> {
     await ChapterService.getChapterById(phase.chapterId);
     const count = await PhaseModel.count({
-      where: {
-        name: phase.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', phase.name)
+      ),
     });
     if (count) {
       throw new AppError('Nome da fase já existe', 400);
@@ -41,11 +42,16 @@ export default class PhaseService {
     await this.getPhaseById(phase.id);
     await ChapterService.getChapterById(phase.chapterId);
     const exist = (await PhaseModel.findOne({
-      where: {
-        name: phase.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', phase.name)
+      ),
     })) as IPhase;
-    if (exist && exist.name === phase.name && exist.id !== phase.id) {
+    if (
+      exist &&
+      exist.name?.toLowerCase() === phase.name?.toLowerCase() &&
+      exist.id !== phase.id
+    ) {
       throw new AppError('Nome da fase já existe', 400);
     }
     await PhaseModel.update(phase as Optional<unknown, never>, {

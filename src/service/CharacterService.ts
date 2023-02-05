@@ -1,14 +1,15 @@
 import AppError from '../shared/AppError';
 import ICharacter from '../interface/ICharacter';
+import sequelize, { Optional } from 'sequelize';
 import { CharacterModel } from '../database/models/CharacterModel';
-import { Optional } from 'sequelize';
 
 export default class CharacterService {
   public static async save(character: ICharacter): Promise<void> {
     const count = await CharacterModel.count({
-      where: {
-        name: character.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', character.name)
+      ),
     });
     if (count) {
       throw new AppError('Nome do personagem já existe', 400);
@@ -27,11 +28,16 @@ export default class CharacterService {
   public static async update(character: ICharacter): Promise<void> {
     await this.getCharacterById(character.id);
     const exist = (await CharacterModel.findOne({
-      where: {
-        name: character.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', character.name)
+      ),
     })) as ICharacter;
-    if (exist && exist.name === character.name && exist.id !== character.id) {
+    if (
+      exist &&
+      exist.name?.toLowerCase() === character.name?.toLowerCase() &&
+      exist.id !== character.id
+    ) {
       throw new AppError('Nome do personagem já existe', 400);
     }
     await CharacterModel.update(character as Optional<unknown, never>, {

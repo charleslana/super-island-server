@@ -1,14 +1,15 @@
 import AppError from '../shared/AppError';
 import ISkill from '../interface/ISkill';
-import { Optional } from 'sequelize';
+import sequelize, { Optional } from 'sequelize';
 import { SkillModel } from '../database/models/SkillModel';
 
 export default class SkillService {
   public static async save(skill: ISkill): Promise<void> {
     const count = await SkillModel.count({
-      where: {
-        name: skill.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', skill.name)
+      ),
     });
     if (count) {
       throw new AppError('Nome da habilidade já existe', 400);
@@ -27,11 +28,16 @@ export default class SkillService {
   public static async update(skill: ISkill): Promise<void> {
     await this.getSkillById(skill.id);
     const exist = (await SkillModel.findOne({
-      where: {
-        name: skill.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', skill.name)
+      ),
     })) as ISkill;
-    if (exist && exist.name === skill.name && exist.id !== skill.id) {
+    if (
+      exist &&
+      exist.name?.toLowerCase() === skill.name?.toLowerCase() &&
+      exist.id !== skill.id
+    ) {
       throw new AppError('Nome da habilidade já existe', 400);
     }
     await SkillModel.update(skill as Optional<unknown, never>, {

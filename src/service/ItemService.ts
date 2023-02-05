@@ -1,14 +1,15 @@
 import AppError from '../shared/AppError';
 import IItem from '../interface/IItem';
+import sequelize, { Optional } from 'sequelize';
 import { ItemModel } from '../database/models/ItemModel';
-import { Optional } from 'sequelize';
 
 export default class ItemService {
   public static async save(item: IItem): Promise<void> {
     const count = await ItemModel.count({
-      where: {
-        name: item.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', item.name)
+      ),
     });
     if (count) {
       throw new AppError('Nome do item já existe', 400);
@@ -27,11 +28,16 @@ export default class ItemService {
   public static async update(item: IItem): Promise<void> {
     await this.getItemById(item.id);
     const exist = (await ItemModel.findOne({
-      where: {
-        name: item.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', item.name)
+      ),
     })) as IItem;
-    if (exist && exist.name === item.name && exist.id !== item.id) {
+    if (
+      exist &&
+      exist.name?.toLowerCase() === item.name?.toLowerCase() &&
+      exist.id !== item.id
+    ) {
       throw new AppError('Nome do item já existe', 400);
     }
     await ItemModel.update(item as Optional<unknown, never>, {

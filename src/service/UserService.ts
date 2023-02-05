@@ -4,18 +4,19 @@ import IPassword from '../interface/IPassword';
 import IUser from '../interface/IUser';
 import jwt from 'jsonwebtoken';
 import RoleEnum from '../enum/RoleEnum';
+import sequelize, { Optional } from 'sequelize';
 import UserCharacterService from './UserCharacterService';
 import UserItemService from './UserItemService';
 import Utils from '../utils/Utils';
-import { Optional } from 'sequelize';
 import { UserModel } from '../database/models/UserModel';
 
 export default class UserService {
   public static async save(user: IUser): Promise<void> {
     const count = await UserModel.count({
-      where: {
-        email: user.email,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('email')),
+        sequelize.fn('lower', user.email)
+      ),
     });
     if (count) {
       throw new AppError('E-mail do usuário já está cadastrado', 400);
@@ -42,11 +43,16 @@ export default class UserService {
   public static async updateName(user: IUser): Promise<void> {
     await this.getUserById(user.id);
     const exist = (await UserModel.findOne({
-      where: {
-        name: user.name,
-      },
+      where: sequelize.where(
+        sequelize.fn('lower', sequelize.col('name')),
+        sequelize.fn('lower', user.name)
+      ),
     })) as IUser;
-    if (exist && exist.name === user.name && exist.id !== user.id) {
+    if (
+      exist &&
+      exist.name?.toLowerCase() === user.name?.toLowerCase() &&
+      exist.id !== user.id
+    ) {
       throw new AppError('Nome do usuário já está cadastrado', 400);
     }
     await UserModel.update(
