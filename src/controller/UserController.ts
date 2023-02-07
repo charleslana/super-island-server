@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import UserService from '../service/UserService';
 import { NextFunction, Request, Response } from 'express';
 
@@ -11,12 +10,12 @@ export default class UserController {
     console.log(`Create user with email ${JSON.stringify(request.body.email)}`);
     try {
       const { email, password, name } = request.body;
-      await UserService.save({
+      const app = await UserService.save({
         email,
         password,
         name,
       });
-      return new AppSuccess('Usuário criado com sucesso', 201).toJSON(response);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -57,11 +56,11 @@ export default class UserController {
     console.log(`Update user name with ${JSON.stringify(request.body)}`);
     try {
       const { name } = request.body;
-      await UserService.updateName({
+      const app = await UserService.updateName({
         id: request.user.id,
         name,
       });
-      return new AppSuccess('Usuário atualizado com sucesso').toJSON(response);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -104,14 +103,14 @@ export default class UserController {
     console.log('Change user password');
     try {
       const { currentPassword, newPassword } = request.body;
-      await UserService.updatePassword(
+      const app = await UserService.updatePassword(
         {
           currentPassword,
           newPassword,
         },
         request.user.id
       );
-      return new AppSuccess('Senha atualizada com sucesso').toJSON(response);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import EnemyService from '../service/EnemyService';
 import IEnemy from '../interface/IEnemy';
 import { NextFunction, Request, Response } from 'express';
@@ -12,8 +11,8 @@ export default class EnemyController {
     console.log(`Create enemy ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IEnemy;
-      await EnemyService.save(data);
-      return new AppSuccess('Inimigo criado com sucesso', 201).toJSON(response);
+      const app = await EnemyService.save(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -55,8 +54,8 @@ export default class EnemyController {
     console.log(`Update enemy ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IEnemy;
-      await EnemyService.update(data);
-      return new AppSuccess('Inimigo atualizado com sucesso').toJSON(response);
+      const app = await EnemyService.update(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -70,8 +69,8 @@ export default class EnemyController {
     console.log(`Delete enemy with id ${request.params.id}`);
     try {
       const { id } = request.params;
-      await EnemyService.delete(+id);
-      return new AppSuccess('Inimigo excluído com sucesso').toJSON(response);
+      const app = await EnemyService.delete(+id);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

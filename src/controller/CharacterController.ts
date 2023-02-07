@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import CharacterService from '../service/CharacterService';
 import ICharacter from '../interface/ICharacter';
 import { NextFunction, Request, Response } from 'express';
@@ -12,10 +11,8 @@ export default class CharacterController {
     console.log(`Create character ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as ICharacter;
-      await CharacterService.save(data);
-      return new AppSuccess('Personagem criado com sucesso', 201).toJSON(
-        response
-      );
+      const app = await CharacterService.save(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -56,10 +53,8 @@ export default class CharacterController {
     console.log(`Update character ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as ICharacter;
-      await CharacterService.update(data);
-      return new AppSuccess('Personagem atualizado com sucesso').toJSON(
-        response
-      );
+      const app = await CharacterService.update(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -73,8 +68,8 @@ export default class CharacterController {
     console.log(`Delete character with id ${request.params.id}`);
     try {
       const { id } = request.params;
-      await CharacterService.delete(+id);
-      return new AppSuccess('Personagem excluído com sucesso').toJSON(response);
+      const app = await CharacterService.delete(+id);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

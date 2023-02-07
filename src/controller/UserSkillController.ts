@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import UserSkillService from '../service/UserSkillService';
 import { NextFunction, Request, Response } from 'express';
 
@@ -11,11 +10,12 @@ export default class UserSkillController {
     console.log(`Create user character skill ${JSON.stringify(request.body)}`);
     try {
       const { userCharacterId, skillId } = request.body;
-      await UserSkillService.save(userCharacterId, skillId, request.user.id);
-      return new AppSuccess(
-        'Habilidade do personagem do usuário criada com sucesso',
-        201
-      ).toJSON(response);
+      const app = await UserSkillService.save(
+        userCharacterId,
+        skillId,
+        request.user.id
+      );
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

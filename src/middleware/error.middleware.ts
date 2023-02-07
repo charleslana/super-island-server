@@ -7,9 +7,10 @@ const errorMiddleware = (
   response: Response,
   next: NextFunction
 ) => {
-  const status = error.statusCode || 500;
   const message = error.message || 'Erro interno do servidor';
-  return response.status(status).json({ status, message });
+  const status = error.status || null;
+  const statusCode = error.statusCode || 500;
+  return response.status(statusCode).json({ statusCode, status, message });
   next();
 };
 

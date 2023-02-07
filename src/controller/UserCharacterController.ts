@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import UserCharacterService from '../service/UserCharacterService';
 import { NextFunction, Request, Response } from 'express';
 
@@ -11,11 +10,8 @@ export default class UserCharacterController {
     console.log(`Create user character ${JSON.stringify(request.body)}`);
     try {
       const { userId, characterId } = request.body;
-      await UserCharacterService.save(userId, characterId);
-      return new AppSuccess(
-        'Personagem do usuário criado com sucesso',
-        201
-      ).toJSON(response);
+      const app = await UserCharacterService.save(userId, characterId);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

@@ -1,4 +1,6 @@
 import AppError from '../shared/AppError';
+import AppStatusEnum from '../enum/AppStatusEnum';
+import AppSuccess from '../shared/AppSuccess';
 import CharacterService from './CharacterService';
 import UserService from './UserService';
 import { CharacterModel } from '../database/models/CharacterModel';
@@ -7,7 +9,10 @@ import { UserCharacterModel } from '../database/models/UserCharacterModel';
 import { UserSkillModel } from '../database/models/UserSkillModel';
 
 export default class UserCharacterService {
-  public static async save(userId: number, characterId: number): Promise<void> {
+  public static async save(
+    userId: number,
+    characterId: number
+  ): Promise<AppSuccess> {
     await UserService.getUserById(userId);
     await CharacterService.getCharacterById(characterId);
     await this.existUserCharacterByUserId(userId, characterId);
@@ -15,6 +20,11 @@ export default class UserCharacterService {
       userId: userId,
       characterId: characterId,
     });
+    return new AppSuccess(
+      AppStatusEnum.UserCharacterCreatedSuccess,
+      'Personagem do usuário criado com sucesso',
+      201
+    );
   }
 
   public static async getAll(userId: number) {
@@ -55,7 +65,11 @@ export default class UserCharacterService {
       ],
     });
     if (!exist) {
-      throw new AppError('Personagem do usuário não encontrado', 404);
+      throw new AppError(
+        AppStatusEnum.UserCharacterNotFound,
+        'Personagem do usuário não encontrado',
+        404
+      );
     }
     return exist;
   }
@@ -71,7 +85,11 @@ export default class UserCharacterService {
       },
     });
     if (count) {
-      throw new AppError('Já existe o personagem na conta do usuário', 400);
+      throw new AppError(
+        AppStatusEnum.UserCharacterAlreadyExists,
+        'Já existe o personagem na conta do usuário',
+        400
+      );
     }
   }
 }

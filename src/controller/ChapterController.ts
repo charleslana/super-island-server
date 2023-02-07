@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import ChapterService from '../service/ChapterService';
 import IChapter from '../interface/IChapter';
 import { NextFunction, Request, Response } from 'express';
@@ -12,10 +11,8 @@ export default class ChapterController {
     console.log(`Create chapter ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IChapter;
-      await ChapterService.save(data);
-      return new AppSuccess('Capítulo criado com sucesso', 201).toJSON(
-        response
-      );
+      const app = await ChapterService.save(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -56,8 +53,8 @@ export default class ChapterController {
     console.log(`Update chapter ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IChapter;
-      await ChapterService.update(data);
-      return new AppSuccess('Capítulo atualizado com sucesso').toJSON(response);
+      const app = await ChapterService.update(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -71,8 +68,8 @@ export default class ChapterController {
     console.log(`Delete chapter with id ${request.params.id}`);
     try {
       const { id } = request.params;
-      await ChapterService.delete(+id);
-      return new AppSuccess('Capítulo excluído com sucesso').toJSON(response);
+      const app = await ChapterService.delete(+id);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

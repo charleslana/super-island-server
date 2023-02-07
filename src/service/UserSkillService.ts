@@ -1,4 +1,6 @@
 import AppError from '../shared/AppError';
+import AppStatusEnum from '../enum/AppStatusEnum';
+import AppSuccess from '../shared/AppSuccess';
 import SkillService from './SkillService';
 import UserCharacterService from './UserCharacterService';
 import { SkillModel } from '../database/models/SkillModel';
@@ -9,7 +11,7 @@ export default class UserSkillService {
     userCharacterId: number,
     skillId: number,
     userId: number
-  ): Promise<void> {
+  ): Promise<AppSuccess> {
     await UserCharacterService.get(userCharacterId, userId);
     await SkillService.getSkillById(skillId);
     await this.existUserSkillByUserCharacterId(userCharacterId, skillId);
@@ -17,6 +19,11 @@ export default class UserSkillService {
       userCharacterId: userCharacterId,
       skillId: skillId,
     });
+    return new AppSuccess(
+      AppStatusEnum.UserSkillCreatedSuccess,
+      'Habilidade do personagem do usuário criada com sucesso',
+      201
+    );
   }
 
   public static async getAll(userCharacterId: number, userId: number) {
@@ -50,6 +57,7 @@ export default class UserSkillService {
     });
     if (!exist) {
       throw new AppError(
+        AppStatusEnum.UserSkillNotFound,
         'Habilidade do personagem do usuário não encontrada',
         404
       );
@@ -69,6 +77,7 @@ export default class UserSkillService {
     });
     if (count) {
       throw new AppError(
+        AppStatusEnum.UserSkillAlreadyExists,
         'Já existe a habilidade no personagem do usuário',
         400
       );

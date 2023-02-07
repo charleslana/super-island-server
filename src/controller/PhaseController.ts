@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import IPhase from '../interface/IPhase';
 import PhaseService from '../service/PhaseService';
 import { NextFunction, Request, Response } from 'express';
@@ -12,8 +11,8 @@ export default class PhaseController {
     console.log(`Create phase ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IPhase;
-      await PhaseService.save(data);
-      return new AppSuccess('Fase criada com sucesso', 201).toJSON(response);
+      const app = await PhaseService.save(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -55,8 +54,8 @@ export default class PhaseController {
     console.log(`Update phase ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IPhase;
-      await PhaseService.update(data);
-      return new AppSuccess('Fase atualizada com sucesso').toJSON(response);
+      const app = await PhaseService.update(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -70,8 +69,8 @@ export default class PhaseController {
     console.log(`Delete phase with id ${request.params.id}`);
     try {
       const { id } = request.params;
-      await PhaseService.delete(+id);
-      return new AppSuccess('Fase excluída com sucesso').toJSON(response);
+      const app = await PhaseService.delete(+id);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

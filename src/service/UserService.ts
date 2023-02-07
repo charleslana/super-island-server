@@ -1,4 +1,6 @@
 import AppError from '../shared/AppError';
+import AppStatusEnum from '../enum/AppStatusEnum';
+import AppSuccess from '../shared/AppSuccess';
 import IAuthenticate from '../interface/IAuthenticate';
 import IPassword from '../interface/IPassword';
 import IUser from '../interface/IUser';
@@ -11,7 +13,7 @@ import Utils from '../utils/Utils';
 import { UserModel } from '../database/models/UserModel';
 
 export default class UserService {
-  public static async save(user: IUser): Promise<void> {
+  public static async save(user: IUser): Promise<AppSuccess> {
     const count = await UserModel.count({
       where: sequelize.where(
         sequelize.fn('lower', sequelize.col('email')),
@@ -19,7 +21,11 @@ export default class UserService {
       ),
     });
     if (count) {
-      throw new AppError('E-mail do usuário já está cadastrado', 400);
+      throw new AppError(
+        AppStatusEnum.UserEmailAlreadyExists,
+        'E-mail do usuário já está cadastrado',
+        400
+      );
     }
     user.password = Utils.encrypt(user.password as string);
     const userSaved = await UserModel.create(user as Optional<unknown, never>);
@@ -28,6 +34,11 @@ export default class UserService {
       await UserCharacterService.save(lastId, index);
       await UserItemService.save(lastId, index);
     }
+    return new AppSuccess(
+      AppStatusEnum.UserCreatedSuccess,
+      'Usuário criado com sucesso',
+      201
+    );
   }
 
   public static async getAll(): Promise<IUser[]> {
@@ -40,7 +51,7 @@ export default class UserService {
     return await this.getUserById(id);
   }
 
-  public static async updateName(user: IUser): Promise<void> {
+  public static async updateName(user: IUser): Promise<AppSuccess> {
     await this.getUserById(user.id);
     const exist = (await UserModel.findOne({
       where: sequelize.where(
@@ -53,7 +64,11 @@ export default class UserService {
       exist.name?.toLowerCase() === user.name?.toLowerCase() &&
       exist.id !== user.id
     ) {
-      throw new AppError('Nome do usuário já está cadastrado', 400);
+      throw new AppError(
+        AppStatusEnum.UserNameAlreadyExists,
+        'Nome do usuário já está cadastrado',
+        400
+      );
     }
     await UserModel.update(
       {
@@ -64,6 +79,10 @@ export default class UserService {
           id: user.id,
         },
       }
+    );
+    return new AppSuccess(
+      AppStatusEnum.UserUpdatedSuccess,
+      'Usuário atualizado com sucesso'
     );
   }
 
@@ -78,13 +97,21 @@ export default class UserService {
       },
     })) as IUser;
     if (!user) {
-      throw new AppError('Login ou senha inválidas', 404);
+      throw new AppError(
+        AppStatusEnum.UserInvalidCredential,
+        'Login ou senha inválidas',
+        403
+      );
     }
     if (!Utils.decrypt(password, user.password as string)) {
-      throw new AppError('Login ou senha inválidas', 404);
+      throw new AppError(
+        AppStatusEnum.UserInvalidCredential,
+        'Login ou senha inválidas',
+        403
+      );
     }
     if (user.role === RoleEnum.Banned) {
-      throw new AppError('A conta está banida', 403);
+      throw new AppError(AppStatusEnum.UserBanned, 'A conta está banida', 403);
     }
     const authToken = Utils.randomString(100);
     const userUpdated = await UserModel.update(
@@ -117,7 +144,11 @@ export default class UserService {
       attributes: { exclude: ['password', 'authToken'] },
     })) as IUser;
     if (!exist) {
-      throw new AppError('Usuário não encontrado', 404);
+      throw new AppError(
+        AppStatusEnum.UserNotFound,
+        'Usuário não encontrado',
+        404
+      );
     }
     return exist;
   }
@@ -125,14 +156,18 @@ export default class UserService {
   public static async updatePassword(
     password: IPassword,
     id: number
-  ): Promise<void> {
+  ): Promise<AppSuccess> {
     const user = (await UserModel.findOne({
       where: {
         id: id,
       },
     })) as IUser;
     if (!Utils.decrypt(password.currentPassword, user.password as string)) {
-      throw new AppError('Senha atual inválida', 400);
+      throw new AppError(
+        AppStatusEnum.UserPasswordInvalidCurrent,
+        'Senha atual inválida',
+        400
+      );
     }
     await UserModel.update(
       {
@@ -143,6 +178,10 @@ export default class UserService {
           id: user.id,
         },
       }
+    );
+    return new AppSuccess(
+      AppStatusEnum.UserPasswordUpdatedSuccess,
+      'Senha atualizada com sucesso'
     );
   }
 }

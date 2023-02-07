@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import IShop from '../interface/IShop';
 import ShopService from '../service/ShopService';
 import { NextFunction, Request, Response } from 'express';
@@ -12,10 +11,8 @@ export default class ShopController {
     console.log(`Create shop ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IShop;
-      await ShopService.save(data);
-      return new AppSuccess('Item da loja criado com sucesso', 201).toJSON(
-        response
-      );
+      const app = await ShopService.save(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -56,10 +53,8 @@ export default class ShopController {
     console.log(`Update shop ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IShop;
-      await ShopService.update(data);
-      return new AppSuccess('Item da loja atualizado com sucesso').toJSON(
-        response
-      );
+      const app = await ShopService.update(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -73,10 +68,8 @@ export default class ShopController {
     console.log(`Delete shop with id ${request.params.id}`);
     try {
       const { id } = request.params;
-      await ShopService.delete(+id);
-      return new AppSuccess('Item da loja excluído com sucesso').toJSON(
-        response
-      );
+      const app = await ShopService.delete(+id);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

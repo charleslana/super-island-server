@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import UserItemService from '../service/UserItemService';
 import { NextFunction, Request, Response } from 'express';
 
@@ -11,10 +10,8 @@ export default class UserItemController {
     console.log(`Create user item ${JSON.stringify(request.body)}`);
     try {
       const { userId, itemId } = request.body;
-      await UserItemService.save(userId, itemId);
-      return new AppSuccess('Item do usuário criado com sucesso', 201).toJSON(
-        response
-      );
+      const app = await UserItemService.save(userId, itemId);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

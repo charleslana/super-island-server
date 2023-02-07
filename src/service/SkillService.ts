@@ -1,10 +1,12 @@
 import AppError from '../shared/AppError';
+import AppStatusEnum from '../enum/AppStatusEnum';
+import AppSuccess from '../shared/AppSuccess';
 import ISkill from '../interface/ISkill';
 import sequelize, { Optional } from 'sequelize';
 import { SkillModel } from '../database/models/SkillModel';
 
 export default class SkillService {
-  public static async save(skill: ISkill): Promise<void> {
+  public static async save(skill: ISkill): Promise<AppSuccess> {
     const count = await SkillModel.count({
       where: sequelize.where(
         sequelize.fn('lower', sequelize.col('name')),
@@ -12,9 +14,18 @@ export default class SkillService {
       ),
     });
     if (count) {
-      throw new AppError('Nome da habilidade já existe', 400);
+      throw new AppError(
+        AppStatusEnum.SkillNameAlreadyExists,
+        'Nome da habilidade já existe',
+        400
+      );
     }
     await SkillModel.create(skill as Optional<unknown, never>);
+    return new AppSuccess(
+      AppStatusEnum.SkillCreatedSuccess,
+      'Habilidade criada com sucesso',
+      201
+    );
   }
 
   public static async getAll(): Promise<ISkill[]> {
@@ -25,7 +36,7 @@ export default class SkillService {
     return await this.getSkillById(id);
   }
 
-  public static async update(skill: ISkill): Promise<void> {
+  public static async update(skill: ISkill): Promise<AppSuccess> {
     await this.getSkillById(skill.id);
     const exist = (await SkillModel.findOne({
       where: sequelize.where(
@@ -38,22 +49,34 @@ export default class SkillService {
       exist.name?.toLowerCase() === skill.name?.toLowerCase() &&
       exist.id !== skill.id
     ) {
-      throw new AppError('Nome da habilidade já existe', 400);
+      throw new AppError(
+        AppStatusEnum.SkillNameAlreadyExists,
+        'Nome da habilidade já existe',
+        400
+      );
     }
     await SkillModel.update(skill as Optional<unknown, never>, {
       where: {
         id: skill.id,
       },
     });
+    return new AppSuccess(
+      AppStatusEnum.SkillUpdatedSuccess,
+      'Habilidade atualizada com sucesso'
+    );
   }
 
-  public static async delete(id: number): Promise<void> {
+  public static async delete(id: number): Promise<AppSuccess> {
     await this.getSkillById(id);
     await SkillModel.destroy({
       where: {
         id: id,
       },
     });
+    return new AppSuccess(
+      AppStatusEnum.SkillDeletedSuccess,
+      'Habilidade excluída com sucesso'
+    );
   }
 
   public static async getSkillById(id?: number): Promise<ISkill> {
@@ -63,7 +86,11 @@ export default class SkillService {
       },
     })) as ISkill;
     if (!exist) {
-      throw new AppError('Habilidade não encontrada', 404);
+      throw new AppError(
+        AppStatusEnum.SkillNotFound,
+        'Habilidade não encontrada',
+        404
+      );
     }
     return exist;
   }

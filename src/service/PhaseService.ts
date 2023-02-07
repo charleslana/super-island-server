@@ -1,4 +1,6 @@
 import AppError from '../shared/AppError';
+import AppStatusEnum from '../enum/AppStatusEnum';
+import AppSuccess from '../shared/AppSuccess';
 import ChapterService from './ChapterService';
 import IPhase from '../interface/IPhase';
 import sequelize, { Optional } from 'sequelize';
@@ -6,7 +8,7 @@ import { ChapterModel } from '../database/models/ChapterModel';
 import { PhaseModel } from '../database/models/PhaseModel';
 
 export default class PhaseService {
-  public static async save(phase: IPhase): Promise<void> {
+  public static async save(phase: IPhase): Promise<AppSuccess> {
     await ChapterService.getChapterById(phase.chapterId);
     const count = await PhaseModel.count({
       where: sequelize.where(
@@ -15,9 +17,18 @@ export default class PhaseService {
       ),
     });
     if (count) {
-      throw new AppError('Nome da fase já existe', 400);
+      throw new AppError(
+        AppStatusEnum.PhaseNameAlreadyExists,
+        'Nome da fase já existe',
+        400
+      );
     }
     await PhaseModel.create(phase as Optional<unknown, never>);
+    return new AppSuccess(
+      AppStatusEnum.PhaseCreatedSuccess,
+      'Fase criada com sucesso',
+      201
+    );
   }
 
   public static async getAll(chapterId: number): Promise<IPhase[]> {
@@ -38,7 +49,7 @@ export default class PhaseService {
     return await this.getPhaseById(id);
   }
 
-  public static async update(phase: IPhase): Promise<void> {
+  public static async update(phase: IPhase): Promise<AppSuccess> {
     await this.getPhaseById(phase.id);
     await ChapterService.getChapterById(phase.chapterId);
     const exist = (await PhaseModel.findOne({
@@ -52,22 +63,34 @@ export default class PhaseService {
       exist.name?.toLowerCase() === phase.name?.toLowerCase() &&
       exist.id !== phase.id
     ) {
-      throw new AppError('Nome da fase já existe', 400);
+      throw new AppError(
+        AppStatusEnum.PhaseNameAlreadyExists,
+        'Nome da fase já existe',
+        400
+      );
     }
     await PhaseModel.update(phase as Optional<unknown, never>, {
       where: {
         id: phase.id,
       },
     });
+    return new AppSuccess(
+      AppStatusEnum.PhaseUpdatedSuccess,
+      'Fase atualizada com sucesso'
+    );
   }
 
-  public static async delete(id: number): Promise<void> {
+  public static async delete(id: number): Promise<AppSuccess> {
     await this.getPhaseById(id);
     await PhaseModel.destroy({
       where: {
         id: id,
       },
     });
+    return new AppSuccess(
+      AppStatusEnum.PhaseDeletedSuccess,
+      'Fase excluída com sucesso'
+    );
   }
 
   public static async getPhaseById(id?: number): Promise<IPhase> {
@@ -83,7 +106,11 @@ export default class PhaseService {
       ],
     })) as IPhase;
     if (!exist) {
-      throw new AppError('Fase não encontrada', 404);
+      throw new AppError(
+        AppStatusEnum.PhaseNotFound,
+        'Fase não encontrada',
+        404
+      );
     }
     return exist;
   }

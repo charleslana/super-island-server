@@ -1,4 +1,5 @@
 import AppError from '../shared/AppError';
+import AppStatusEnum from '../enum/AppStatusEnum';
 import DecodeType from '../types/decode.type';
 import IUser from '../interface/IUser';
 import jwt from 'jsonwebtoken';
@@ -6,7 +7,11 @@ import { NextFunction, Request, Response } from 'express';
 import { UserModel } from '../database/models/UserModel';
 
 const handleUnauthorizedError = (next: NextFunction) => {
-  const error: AppError = new AppError('Acesso negado', 401);
+  const error: AppError = new AppError(
+    AppStatusEnum.AccessDenied,
+    'Acesso negado',
+    401
+  );
   next(error);
 };
 

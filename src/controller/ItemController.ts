@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import IItem from '../interface/IItem';
 import ItemService from '../service/ItemService';
 import { NextFunction, Request, Response } from 'express';
@@ -12,8 +11,8 @@ export default class ItemController {
     console.log(`Create item ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IItem;
-      await ItemService.save(data);
-      return new AppSuccess('Item criado com sucesso', 201).toJSON(response);
+      const app = await ItemService.save(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -54,8 +53,8 @@ export default class ItemController {
     console.log(`Update item ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as IItem;
-      await ItemService.update(data);
-      return new AppSuccess('Item atualizado com sucesso').toJSON(response);
+      const app = await ItemService.update(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -69,8 +68,8 @@ export default class ItemController {
     console.log(`Delete item with id ${request.params.id}`);
     try {
       const { id } = request.params;
-      await ItemService.delete(+id);
-      return new AppSuccess('Item excluído com sucesso').toJSON(response);
+      const app = await ItemService.delete(+id);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }

@@ -1,3 +1,5 @@
+import AppStatusEnum from './enum/AppStatusEnum';
+import AppSuccess from './shared/AppSuccess';
 import ConfigService from './service/ConfigService';
 import cors from 'cors';
 import errorMiddleware from './middleware/error.middleware';
@@ -34,9 +36,11 @@ app.use(errorMiddleware);
 
 app.use((request: Request, response: Response) => {
   console.log(`Route ${request.url} not found`);
-  return response.status(404).json({
-    message: 'Rota não encontrada',
-  });
+  return new AppSuccess(
+    AppStatusEnum.RouteNotFound,
+    'Rota não encontrada',
+    404
+  ).toJSON(response);
 });
 
 const port = process.env.PORT || 5000;

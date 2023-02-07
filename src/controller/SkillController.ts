@@ -1,4 +1,3 @@
-import AppSuccess from '../shared/AppSuccess';
 import ISkill from '../interface/ISkill';
 import SkillService from '../service/SkillService';
 import { NextFunction, Request, Response } from 'express';
@@ -12,10 +11,8 @@ export default class SkillController {
     console.log(`Create skill ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as ISkill;
-      await SkillService.save(data);
-      return new AppSuccess('Habilidade criada com sucesso', 201).toJSON(
-        response
-      );
+      const app = await SkillService.save(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -56,10 +53,8 @@ export default class SkillController {
     console.log(`Update skill ${JSON.stringify(request.body)}`);
     try {
       const data = request.body as ISkill;
-      await SkillService.update(data);
-      return new AppSuccess('Habilidade atualizada com sucesso').toJSON(
-        response
-      );
+      const app = await SkillService.update(data);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
@@ -73,8 +68,8 @@ export default class SkillController {
     console.log(`Delete skill with id ${request.params.id}`);
     try {
       const { id } = request.params;
-      await SkillService.delete(+id);
-      return new AppSuccess('Habilidade excluída com sucesso').toJSON(response);
+      const app = await SkillService.delete(+id);
+      return app.toJSON(response);
     } catch (error) {
       next(error);
     }
